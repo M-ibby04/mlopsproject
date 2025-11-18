@@ -7,10 +7,15 @@
 #Jupyter notebook checkpoints
 .ipynb_checkpoints/
 
-#Data folders (we don't push raw/processed data)
-data/raw/
-data/interim/
-data/processed/
+# Ignore data contents, but keep folders
+data/raw/*
+!data/raw/.gitkeep
+
+data/interim/*
+!data/interim/.gitkeep
+
+data/processed/*
+!data/processed/.gitkeep
 
 #OS junk
 .DS_Store

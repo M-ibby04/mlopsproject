@@ -1,0 +1,17 @@
+#Virtual environment
+.venv/
+
+#VS Code settings
+.vscode/
+
+#Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+#Data folders (we don't push raw/processed data)
+data/raw/
+data/interim/
+data/processed/
+
+#OS junk
+.DS_Store
+Thumbs.db

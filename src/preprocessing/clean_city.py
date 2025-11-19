@@ -125,5 +125,6 @@ def process_all_cities():
         df_node.to_csv(out_path, index=False)
         print(f"Saved {out_path}, shape={df_node.shape}")
 
-
+if __name__ == "__main__":
+    process_all_cities()
 

@@ -1,25 +1,50 @@
-#Virtual environment
+# ----------------------------------------
+# Virtual environment
+# ----------------------------------------
 .venv/
+env/
+venv/
 
-#VS Code settings
+# ----------------------------------------
+# VS Code settings
+# ----------------------------------------
 .vscode/
 
-#Jupyter notebook checkpoints
+# ----------------------------------------
+# Jupyter notebook checkpoints
+# ----------------------------------------
 .ipynb_checkpoints/
 
-# Ignore data contents, but keep folders
+# ----------------------------------------
+# Python cache
+# ----------------------------------------
+__pycache__/
+*.pyc
+
+# ----------------------------------------
+# Data folders — keep the folder, ignore contents
+# ----------------------------------------
 data/raw/*
 !data/raw/.gitkeep
 
 data/interim/*
 !data/interim/.gitkeep
 
-*.pyc
-processed_data/
-
 data/processed/*
 !data/processed/.gitkeep
 
-#OS junk
+# ----------------------------------------
+# Model artifacts — don't push trained models
+# ----------------------------------------
+models_tff/*
+!models_tff/.gitkeep
+
+*.keras
+*.h5
+*.pb
+
+# ----------------------------------------
+# OS junk
+# ----------------------------------------
 .DS_Store
 Thumbs.db

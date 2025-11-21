@@ -126,6 +126,9 @@ def process_all_cities():
         print(f"Saved {out_path}, shape={df_node.shape}")
 
 
-# if __name__ == "__main__":
-#     process_all_cities()
+
+
+
+if __name__ == "__main__":
+    process_all_cities()
 

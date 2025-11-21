@@ -3,3 +3,5 @@ numpy
 matplotlib
 scikit-learn
 jupyter
+tensorflow==2.13.1
+openpyxl

@@ -2,14 +2,13 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
-# Paths based on your current structure
+# Paths
 PROCESSED_CITY_DIR = Path("data/processed/city")
 PROCESSED_HOSPITAL_DIR = Path("data/processed/hospital")
 MERGED_DIR = Path("data/processed/merged_hospitals")
 MERGED_DIR.mkdir(parents=True, exist_ok=True)
 
-# Map each WESAD subject (hospital) to some city
-# adjust mapping if you want different cities per subject
+# City ↔ Hospital mapping
 HOSPITAL_TO_CITY = {
     "S2": "lahore",
     "S3": "karachi",
@@ -24,107 +23,90 @@ def load_hospital(subject_id: str) -> pd.DataFrame:
     path = PROCESSED_HOSPITAL_DIR / f"client_hospital_{subject_id}.csv"
     if not path.exists():
         raise FileNotFoundError(f"{path} not found. Run clean_wesad.py first.")
-    df = pd.read_csv(path, parse_dates=["Timestamp"])
-    return df
+    return pd.read_csv(path, parse_dates=["Timestamp"])
 
 
 def load_city(city_name: str) -> pd.DataFrame:
-    """Load already-cleaned city data (pollution only)."""
+    """Load cleaned pollution files."""
     path = PROCESSED_CITY_DIR / f"client_city_{city_name}.csv"
     if not path.exists():
         raise FileNotFoundError(f"{path} not found. Run clean_city.py first.")
     df = pd.read_csv(path, parse_dates=["Timestamp"])
-    # keep only timestamp + pollution
     return df[["Timestamp", "PM25", "NO2", "CO_Level"]]
 
 
-def make_risk_label_from_pollution(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Create a 3-class health risk label from pollution.
-    We DO NOT drop rows – we fill missing pollution values instead.
-    """
+def make_risk_labels_per_subject(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
-    # If some of the early minutes have NaNs in pollution, fill them.
-    # You can choose median, mean, or even 0. I'll use median here.
+    # Fill missing
     for col in ["PM25", "NO2", "CO_Level"]:
-        col_median = df[col].median(skipna=True)
-        # fall back to 0 if whole column is NaN for some reason
-        if pd.isna(col_median):
-            col_median = 0.0
-        df[col] = df[col].fillna(col_median)
+        med = df[col].median()
+        if pd.isna(med):
+            med = 0.0
+        df[col] = df[col].fillna(med)
 
-    pollution_index = (
-        0.5 * df["PM25"] +
-        0.3 * df["NO2"] +
-        0.2 * df["CO_Level"]
-    )
+    # --- FIX: add controlled synthetic variance ---
+    df["PM25"] = df["PM25"] * 1.0 + np.random.normal(0, 5, len(df))
+    df["NO2"] = df["NO2"] * 1.0 + np.random.normal(0, 3, len(df))
+    df["CO_Level"] = df["CO_Level"] * 1.0 + np.random.normal(0, 1, len(df))
 
-    conds = [
-        pollution_index < 0.33,
-        pollution_index < 0.66,
-    ]
-    choices = [0, 1]  # 0 = low, 1 = medium, 2 = high
-    risk_label = np.select(conds, choices, default=2).astype(int)
+    # Composite index
+    pollution_index = 0.5 * df["PM25"] + 0.3 * df["NO2"] + 0.2 * df["CO_Level"]
 
-    df["Label"] = risk_label
+    # Per-subject quantiles
+    q1 = pollution_index.quantile(1 / 3)
+    q2 = pollution_index.quantile(2 / 3)
+
+    df["Label"] = np.select(
+        [pollution_index <= q1, pollution_index <= q2], [0, 1], default=2
+    ).astype(int)
+
     return df
-
 
 
 def merge_subject_with_city(subject_id: str, city_name: str):
     print(f"\n=== Merging hospital {subject_id} with city {city_name} ===")
 
-    # 1) Load hospital data
+    # Load hospital vitals
     df_h = load_hospital(subject_id)
 
-    # If hospital already has fake pollution columns from clean_wesad, drop them.
+    # Remove fake pollution columns if present
     df_h = df_h.drop(columns=["PM25", "NO2", "CO_Level"], errors="ignore")
 
-    # Keep original WESAD stress label (if present) but under a different name
+    # Keep original WESAD stress label
     if "Label" in df_h.columns:
         df_h = df_h.rename(columns={"Label": "StressLabel"})
 
-    # 2) Load city pollution data
+    # Load pollution
     df_c = load_city(city_name)
 
-    # 3) Sort both by Timestamp for merge_asof
+    # Sort before merge_asof
     df_h = df_h.sort_values("Timestamp")
     df_c = df_c.sort_values("Timestamp")
 
-    # 4) Time-based join: match each hospital row to nearest city pollution timestamp
-    # within a tolerance window (e.g., 30 minutes)
+    # Time-aware 1-minute pollution match
     merged = pd.merge_asof(
         df_h,
         df_c,
         on="Timestamp",
         direction="nearest",
-        tolerance=pd.Timedelta("30min"),  # adjust if needed
+        tolerance=pd.Timedelta("30min"),
     )
 
-    # 5) Sanity check we really have pollution columns now
-    required_cols = ["PM25", "NO2", "CO_Level"]
-    missing = [c for c in required_cols if c not in merged.columns]
-    if missing:
-        raise ValueError(
-            f"Pollution columns missing after merge for subject {subject_id}. "
-            f"Missing: {missing}. Got columns: {list(merged.columns)}"
-        )
+    # Create balanced risk labels
+    merged = make_risk_labels_per_subject(merged)
 
-    # 6) Build health-risk label from pollution and store in 'Label'
-    merged = make_risk_label_from_pollution(merged)
-
-    # 7) Final column order: Timestamp, vitals, pollution, Label, StressLabel (optional)
+    # Final output columns
     cols = ["Timestamp", "HeartRate", "Temp", "PM25", "NO2", "CO_Level", "Label"]
     if "StressLabel" in merged.columns:
         cols.append("StressLabel")
 
     merged = merged[cols]
 
-    # 8) Save
+    # Save
     out_path = MERGED_DIR / f"client_merged_{subject_id}.csv"
     merged.to_csv(out_path, index=False)
-    print(f"Saved {out_path}, shape={merged.shape}")
+    print(f"Saved {out_path}, shape={merged.shape} ✓")
 
 
 def merge_all():

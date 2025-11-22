@@ -1,0 +1,25 @@
+# Ignore ALL data files — do NOT send datasets to Docker
+data/
+
+# Python cache + temp files
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / Editor junk files
+.DS_Store
+Thumbs.db
+
+# Large files that should never be in Docker image
+*.xlsx
+*.csv
+*.zip
+*.pkl

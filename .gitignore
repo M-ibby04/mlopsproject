@@ -1,28 +1,32 @@
-# Ignore all data by default
-# Ignore ONLY real data
+# Ignore all real data
 data/real_backup/
 
-# Allow dummy data
-!data/raw/city/*
-!data/raw/hospitals/*
+# Allow ONLY dummy city files
+!data/raw/city/*dummy*
 
-# Keep folders
+# Allow ONLY dummy hospital files
+!data/raw/hospitals/*dummy*
+
+# Keep folder structure
 !data/
 !data/raw/
 !data/raw/city/
 !data/raw/hospitals/
 
+# Ignore all model files
+models_tff/*.keras
 
-# Models
-models_tff/
+# But keep the folder itself
+!models_tff/
 !models_tff/.gitkeep
 
-# Jupyter & Python cache
-.ipynb_checkpoints/
+# Python cache / temp
 __pycache__/
 *.pyc
+*.pyo
+.ipynb_checkpoints/
 
-# Virtual envs
+# Virtual environments
 .venv/
 venv/
 env/

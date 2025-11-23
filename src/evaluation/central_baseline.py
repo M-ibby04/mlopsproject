@@ -10,12 +10,13 @@ import tensorflow as tf
 
 # ==== CONFIG ====
 # You can switch this between "Label" (pollution risk) and "StressLabel" (original WESAD)
-TARGET_COLUMN = "Label"         # or "StressLabel"
+TARGET_COLUMN = "Label"  # or "StressLabel"
 
 FEATURE_COLUMNS = ["HeartRate", "Temp", "PM25", "NO2", "CO_Level"]
 
 MERGED_DIR = Path("data/processed/merged_hospitals")
 MODEL_OUT = Path("models_tff/baseline_central_model.keras")
+MODEL_OUT.parent.mkdir(parents=True, exist_ok=True)
 
 
 def load_merged_dataset() -> pd.DataFrame:

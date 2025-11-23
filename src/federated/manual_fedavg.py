@@ -12,6 +12,8 @@ import tensorflow as tf
 
 MERGED_DIR = Path("data/processed/merged_hospitals")
 MODEL_OUT = Path("models_tff/manual_fedavg_global_model.keras")
+MODEL_OUT.parent.mkdir(parents=True, exist_ok=True)
+
 
 FEATURE_COLS = ["HeartRate", "Temp", "PM25", "NO2", "CO_Level"]
 LABEL_COL = "Label"

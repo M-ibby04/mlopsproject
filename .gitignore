@@ -1,63 +1,53 @@
-# ----------------------------------------
-# Virtual environment
-# ----------------------------------------
-.venv/
-env/
-venv/
+# ============================================
+# Ignore ALL data by default
+# ============================================
+data/**
 
-# ----------------------------------------
-# VS Code settings
-# ----------------------------------------
-.vscode/
+# BUT allow dummy datasets (city + hospitals)
+!data/raw/city/*dummy*
+!data/raw/hospitals/*dummy*
 
-# ----------------------------------------
-# Jupyter notebook checkpoints
-# ----------------------------------------
-.ipynb_checkpoints/
+# If dummy files were renamed to real names, allow them:
+!data/raw/city/*.xlsx
+!data/raw/city/*.csv
+!data/raw/hospitals/*.pkl
 
-# ----------------------------------------
-# Python cache
-# ----------------------------------------
-__pycache__/
-*.pyc
+# Allow .gitkeep
+!data/**/.gitkeep
 
-# ----------------------------------------
-# Ignore ALL real data, allow ONLY dummy data
-# ----------------------------------------
-
-# Ignore everything inside data/raw/city
-data/raw/city/*
-# Allow dummy files
-!data/raw/city/*dummy*.csv
-!data/raw/city/*dummy*.xlsx
-
-# If you have dummy hospital data in future:
-data/raw/hospitals/*
-!data/raw/hospitals/*dummy*.pkl
-!data/raw/hospitals/*dummy*.csv
-
-# Keep folder structure
-!data/raw/.gitkeep
-!data/interim/.gitkeep
-!data/processed/.gitkeep
-
-# ----------------------------------------
-# Processed data (never push)
-# ----------------------------------------
-data/interim/*
-data/processed/*
-
-# ----------------------------------------
-# Model artifacts — don't push trained models
-# ----------------------------------------
+# ============================================
+# Ignore model artifacts
+# ============================================
 models_tff/*
 !models_tff/.gitkeep
-*.keras
-*.h5
-*.pb
 
-# ----------------------------------------
+# ============================================
+# Notebook outputs
+# ============================================
+notebooks/
+!notebooks/.gitkeep
+
+# ============================================
+# Python cache + temp
+# ============================================
+__pycache__/
+*.pyc
+*.pyo
+
+# ============================================
+# Virtual environments
+# ============================================
+venv/
+env/
+.venv/
+
+# ============================================
+# Jupyter
+# ============================================
+.ipynb_checkpoints/
+
+# ============================================
 # OS junk
-# ----------------------------------------
+# ============================================
 .DS_Store
 Thumbs.db

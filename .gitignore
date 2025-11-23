@@ -1,53 +1,32 @@
-# ============================================
-# Ignore ALL data by default
-# ============================================
-data/**
+# Ignore all data by default
+# Ignore ONLY real data
+data/real_backup/
 
-# BUT allow dummy datasets (city + hospitals)
-!data/raw/city/*dummy*
-!data/raw/hospitals/*dummy*
+# Allow dummy data
+!data/raw/city/*
+!data/raw/hospitals/*
 
-# If dummy files were renamed to real names, allow them:
-!data/raw/city/*.xlsx
-!data/raw/city/*.csv
-!data/raw/hospitals/*.pkl
+# Keep folders
+!data/
+!data/raw/
+!data/raw/city/
+!data/raw/hospitals/
 
-# Allow .gitkeep
-!data/**/.gitkeep
 
-# ============================================
-# Ignore model artifacts
-# ============================================
-models_tff/*
+# Models
+models_tff/
 !models_tff/.gitkeep
 
-# ============================================
-# Notebook outputs
-# ============================================
-notebooks/
-!notebooks/.gitkeep
-
-# ============================================
-# Python cache + temp
-# ============================================
+# Jupyter & Python cache
+.ipynb_checkpoints/
 __pycache__/
 *.pyc
-*.pyo
 
-# ============================================
-# Virtual environments
-# ============================================
+# Virtual envs
+.venv/
 venv/
 env/
-.venv/
 
-# ============================================
-# Jupyter
-# ============================================
-.ipynb_checkpoints/
-
-# ============================================
-# OS junk
-# ============================================
+# OS files
 .DS_Store
 Thumbs.db

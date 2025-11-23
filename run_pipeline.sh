@@ -1,32 +1,19 @@
-# Ignore all data by default
-# Ignore ONLY real data
-data/real_backup/
+#!/bin/bash
+set -e
 
-# Allow dummy data
-!data/raw/city/*
-!data/raw/hospitals/*
+echo "=== STEP 1: Preprocess city data ==="
+python src/preprocessing/clean_city.py
 
-# Keep folders
-!data/
-!data/raw/
-!data/raw/city/
-!data/raw/hospitals/
+echo "=== STEP 2: Train central baseline model ==="
+python src/evaluation/central_baseline.py
 
+echo "=== STEP 3: Train manual FedAvg model ==="
+python src/federated/manual_fedavg.py
 
-# Models
-models_tff/
-!models_tff/.gitkeep
+echo "=== STEP 4: Evaluate global model ==="
+python -m src.federated.eval_global_model
 
-# Jupyter & Python cache
-.ipynb_checkpoints/
-__pycache__/
-*.pyc
+echo "=== STEP 5: Run data drift detection ==="
+python src/evaluation/data_drift.py
 
-# Virtual envs
-.venv/
-venv/
-env/
-
-# OS files
-.DS_Store
-Thumbs.db
+echo "=== PIPELINE COMPLETED SUCCESSFULLY ==="

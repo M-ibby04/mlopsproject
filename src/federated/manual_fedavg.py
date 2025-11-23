@@ -7,6 +7,13 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
+from src.utilis.experiment_tracker import log_experiment
+
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 
 # ---------- CONFIG ----------
 
@@ -202,6 +209,32 @@ def main():
             f"Round {round_idx} aggregated eval: "
             f"loss={agg_loss:.4f}, acc={agg_acc:.4f}"
         )
+
+        # ---- Final global evaluation before logging ----
+    all_X = np.concatenate([X for (X, _) in client_datasets.values()], axis=0)
+    all_y = np.concatenate([y for (_, y) in client_datasets.values()], axis=0)
+    test_loss, test_acc = global_model.evaluate(all_X, all_y, verbose=0)
+
+    print(f"\nFinal Global Model Performance:")
+    print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_acc:.4f}")
+
+    # ---- Experiment tracking ----
+    metrics = {
+        "test_loss": float(test_loss),
+        "test_accuracy": float(test_acc),
+    }
+
+    params = {
+        "num_clients": len(client_datasets),
+        "rounds": NUM_ROUNDS,
+        "local_epochs": LOCAL_EPOCHS,
+        "batch_size": BATCH_SIZE,
+        "learning_rate": LEARNING_RATE,
+        "num_features": len(FEATURE_COLS),
+    }
+
+    log_experiment("manual_fedavg_global", metrics, params)
+    # ------------------------------
 
     # 4) Save final global model
     MODEL_OUT.parent.mkdir(parents=True, exist_ok=True)

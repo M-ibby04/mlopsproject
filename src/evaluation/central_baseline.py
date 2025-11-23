@@ -7,6 +7,12 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from src.utilis.experiment_tracker import log_experiment
+
 
 # ==== CONFIG ====
 # You can switch this between "Label" (pollution risk) and "StressLabel" (original WESAD)
@@ -111,6 +117,25 @@ def main():
 
     print("Confusion matrix:")
     print(confusion_matrix(y_test, y_pred))
+    # ---- Experiment tracking ----
+    val_loss = float(history.history["val_loss"][-1])
+    val_accuracy = float(history.history["val_accuracy"][-1])
+
+    metrics = {
+        "val_loss": val_loss,
+        "val_accuracy": val_accuracy,
+        "test_loss": float(test_loss),
+        "test_accuracy": float(test_acc),
+    }
+
+    params = {
+        "epochs": 30,
+        "batch_size": 32,
+        "learning_rate": 1e-3,
+        "num_features": num_features,
+    }
+
+    log_experiment("central_baseline", metrics, params)
 
     # Save the model so you can compare later
     model.save(MODEL_OUT)

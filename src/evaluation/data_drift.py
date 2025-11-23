@@ -1,7 +1,10 @@
 import pandas as pd
 import numpy as np
+import json
+import os
 from scipy.stats import ks_2samp
 from pathlib import Path
+from datetime import datetime
 
 FEATURE_COLS = ["HeartRate", "Temp", "PM25", "NO2", "CO_Level"]
 LABEL_COL = "Label"
@@ -38,30 +41,36 @@ def detect_drift(train_df, new_df):
     report = {}
 
     for col in FEATURE_COLS:
-        ks_stat, ks_p = ks_2samp(train_df[col], new_df[col])
-        psi_val = psi(train_df[col], new_df[col])
+        ks_statistic, ks_p_value = ks_2samp(train_df[col], new_df[col])
+        psi_value = psi(train_df[col], new_df[col])
+
+        drift_label = (
+            "HIGH" if psi_value > 0.25 else "MEDIUM" if psi_value > 0.10 else "LOW"
+        )
 
         report[col] = {
-            "ks_p_value": float(ks_p),
-            "psi": float(psi_val),
-            "drift_level": (
-                "HIGH" if psi_val > 0.25 else "MEDIUM" if psi_val > 0.1 else "LOW"
-            ),
+            "ks_statistic": float(ks_statistic),
+            "ks_p_value": float(ks_p_value),
+            "psi": float(psi_value),
+            "drift_level": drift_label,
         }
 
-    # Label drift
+    # Label distribution drift (classification)
     label_train = train_df[LABEL_COL].value_counts(normalize=True)
     label_new = new_df[LABEL_COL].value_counts(normalize=True)
+
     label_psi = np.sum(
         (label_train - label_new).fillna(0)
         * np.log((label_train + 1e-8) / (label_new + 1e-8))
     )
 
+    label_drift = (
+        "HIGH" if label_psi > 0.25 else "MEDIUM" if label_psi > 0.10 else "LOW"
+    )
+
     report["Label"] = {
         "psi": float(label_psi),
-        "drift_level": (
-            "HIGH" if label_psi > 0.25 else "MEDIUM" if label_psi > 0.1 else "LOW"
-        ),
+        "drift_level": label_drift,
     }
 
     return report
@@ -77,10 +86,31 @@ def main():
     print("[DRIFT] Computing drift scores...\n")
     report = detect_drift(train_df, new_df)
 
+    # Print report
     for col, info in report.items():
         print(
-            f"{col}: drift={info['drift_level']} | KS p={info.get('ks_p_value', 'N/A')}, PSI={info['psi']:.4f}"
+            f"{col}: drift={info['drift_level']} | "
+            f"KS_p={info.get('ks_p_value', 'N/A')} | "
+            f"PSI={info['psi']:.4f}"
         )
+
+    # ---- Save summary to JSON ----
+    latest_label_drift = report["Label"]["drift_level"]
+    latest_label_psi = report["Label"]["psi"]
+
+    summary = {
+        "label": latest_label_drift,
+        "label_psi": latest_label_psi,
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+
+    os.makedirs("data/processed/eval", exist_ok=True)
+    out_path = "data/processed/eval/data_drift_summary.json"
+
+    with open(out_path, "w") as f:
+        json.dump(summary, f, indent=2)
+
+    print(f"\n[DataDrift] Summary saved to {out_path}")
 
 
 if __name__ == "__main__":

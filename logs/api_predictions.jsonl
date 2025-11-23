@@ -1,0 +1,1 @@
+{"timestamp": "2025-11-23T16:06:51.435205", "input": {"HeartRate": 78.0, "Temp": 37.2, "PM25": 42.0, "NO2": 36.0, "CO_Level": 1.1}, "prediction": 1, "raw_output": [0.0, 1.0, 0.0]}

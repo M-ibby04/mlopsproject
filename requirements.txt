@@ -5,3 +5,6 @@ scikit-learn
 jupyter
 tensorflow==2.13.1
 openpyxl
+fastapi
+uvicorn
+pydantic

@@ -16,4 +16,7 @@ python -m src.federated.eval_global_model
 echo "=== STEP 5: Run data drift detection ==="
 python src/evaluation/data_drift.py
 
+echo "=== STEP 6: Conditional retraining if drift is HIGH ==="
+python src/training/retrain_if_drift.py
+
 echo "=== PIPELINE COMPLETED SUCCESSFULLY ==="

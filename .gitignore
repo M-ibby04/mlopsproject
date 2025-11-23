@@ -1,36 +1,37 @@
-# Ignore all real data
+# === REAL DATA (never push) ===
 data/real_backup/
 
-# Allow ONLY dummy city files
+# === ALLOW ONLY DUMMY DATA FILES ===
 !data/raw/city/*dummy*
-
-# Allow ONLY dummy hospital files
 !data/raw/hospitals/*dummy*
 
-# Keep folder structure
+# Keep folder structure so GitHub Actions doesn’t break
 !data/
 !data/raw/
 !data/raw/city/
 !data/raw/hospitals/
 
-# Ignore all model files
+# Block everything else inside raw (real files)
+data/raw/*
+
+# === MODELS (large files — never push) ===
 models_tff/*.keras
 
-# But keep the folder itself
+# Keep the folder & gitkeep
 !models_tff/
 !models_tff/.gitkeep
 
-# Python cache / temp
+# === PYTHON CACHE ===
 __pycache__/
 *.pyc
 *.pyo
 .ipynb_checkpoints/
 
-# Virtual environments
+# === ENVIRONMENTS ===
 .venv/
 venv/
 env/
 
-# OS files
+# === OS JUNK ===
 .DS_Store
 Thumbs.db

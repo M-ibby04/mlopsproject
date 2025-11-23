@@ -22,23 +22,36 @@ __pycache__/
 *.pyc
 
 # ----------------------------------------
-# Data folders — keep the folder, ignore contents
+# Ignore ALL real data, allow ONLY dummy data
 # ----------------------------------------
-data/raw/*
+
+# Ignore everything inside data/raw/city
+data/raw/city/*
+# Allow dummy files
+!data/raw/city/*dummy*.csv
+!data/raw/city/*dummy*.xlsx
+
+# If you have dummy hospital data in future:
+data/raw/hospitals/*
+!data/raw/hospitals/*dummy*.pkl
+!data/raw/hospitals/*dummy*.csv
+
+# Keep folder structure
 !data/raw/.gitkeep
-
-data/interim/*
 !data/interim/.gitkeep
-
-data/processed/*
 !data/processed/.gitkeep
+
+# ----------------------------------------
+# Processed data (never push)
+# ----------------------------------------
+data/interim/*
+data/processed/*
 
 # ----------------------------------------
 # Model artifacts — don't push trained models
 # ----------------------------------------
 models_tff/*
 !models_tff/.gitkeep
-
 *.keras
 *.h5
 *.pb

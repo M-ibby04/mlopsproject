@@ -26,5 +26,7 @@ RUN pip install --no-cache-dir \
     openpyxl \
     tensorflow==2.13.1
 
+RUN pip install openpyxl
+
 # Default to bash; you’ll run scripts manually
 CMD ["bash"]

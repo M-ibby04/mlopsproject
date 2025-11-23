@@ -6,7 +6,7 @@ import tensorflow as tf
 from .client import FEATURE_COLS
 from .model import NUM_CLASSES
 
-MODEL_PATH = "models_tff/tff_global_model"
+MODEL_PATH = "models_tff/manual_fedavg_global_model.keras"
 TEST_CSV_PATH = "data/processed/test/test_all_clients.csv"
 
 
@@ -51,15 +51,12 @@ def main():
     results = model.evaluate(test_ds, verbose=0, return_dict=True)
     print(f"[EVAL] Test results: {results}")
 
-
     print("[EVAL] Generating predictions for confusion matrix...")
     y_pred_probs = model.predict(test_ds, verbose=0)
     y_pred = np.argmax(y_pred_probs, axis=1)
 
     # Confusion matrix
-    conf_mat = tf.math.confusion_matrix(
-        y_true, y_pred, num_classes=NUM_CLASSES
-    ).numpy()
+    conf_mat = tf.math.confusion_matrix(y_true, y_pred, num_classes=NUM_CLASSES).numpy()
 
     print("\n[EVAL] Confusion matrix (rows = true labels, cols = predicted labels):")
     print(conf_mat)

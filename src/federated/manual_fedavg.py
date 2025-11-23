@@ -16,10 +16,10 @@ MODEL_OUT = Path("models_tff/manual_fedavg_global_model.keras")
 FEATURE_COLS = ["HeartRate", "Temp", "PM25", "NO2", "CO_Level"]
 LABEL_COL = "Label"
 
-NUM_CLASSES = 3
+NUM_CLASSES = 8
 
-NUM_ROUNDS = 10          # federated rounds
-LOCAL_EPOCHS = 5         # epochs per client per round
+NUM_ROUNDS = 10  # federated rounds
+LOCAL_EPOCHS = 5  # epochs per client per round
 BATCH_SIZE = 16
 LEARNING_RATE = 1e-3
 SEED = 42
@@ -29,6 +29,7 @@ np.random.seed(SEED)
 
 
 # ---------- UTILS ----------
+
 
 def build_base_model() -> tf.keras.Model:
     """Simple MLP used by all clients + global model."""
@@ -46,8 +47,7 @@ def build_base_model() -> tf.keras.Model:
     return model
 
 
-def oversample_balance(df: pd.DataFrame,
-                       label_col: str = LABEL_COL) -> pd.DataFrame:
+def oversample_balance(df: pd.DataFrame, label_col: str = LABEL_COL) -> pd.DataFrame:
     """
     Balance a client's dataframe by oversampling minority classes
     up to the size of the majority class.
@@ -78,9 +78,8 @@ def oversample_balance(df: pd.DataFrame,
             expanded = pd.concat([class_df] * reps, ignore_index=True)
             if rem > 0:
                 expanded = pd.concat(
-                    [expanded,
-                     class_df.sample(rem, replace=True, random_state=SEED)],
-                    ignore_index=True
+                    [expanded, class_df.sample(rem, replace=True, random_state=SEED)],
+                    ignore_index=True,
                 )
         else:
             expanded = class_df.copy()
@@ -121,8 +120,10 @@ def weighted_average_weights(client_weights, client_sizes):
     # zip over each layer's weights
     for layer_idx in range(len(client_weights[0])):
         layer_stack = np.stack(
-            [cw[layer_idx] * (n / total_examples)
-             for cw, n in zip(client_weights, client_sizes)],
+            [
+                cw[layer_idx] * (n / total_examples)
+                for cw, n in zip(client_weights, client_sizes)
+            ],
             axis=0,
         )
         new_layer = np.sum(layer_stack, axis=0)
@@ -132,6 +133,7 @@ def weighted_average_weights(client_weights, client_sizes):
 
 
 # ---------- MAIN TRAINING LOOP ----------
+
 
 def main():
     # 1) Load all client datasets

@@ -1,6 +1,9 @@
 # Ignore ALL data files — do NOT send datasets to Docker
 data/
 
+models_tff/
+notebooks/
+
 # Python cache + temp files
 __pycache__/
 *.pyc

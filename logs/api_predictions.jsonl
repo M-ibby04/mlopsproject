@@ -1,1 +1,5 @@
 {"timestamp": "2025-11-23T16:06:51.435205", "input": {"HeartRate": 78.0, "Temp": 37.2, "PM25": 42.0, "NO2": 36.0, "CO_Level": 1.1}, "prediction": 1, "raw_output": [0.0, 1.0, 0.0]}
+{"timestamp": "2025-11-23T20:38:32.236946", "input": {"HeartRate": 90.0, "Temp": 36.5, "PM25": 50.0, "NO2": 20.0, "CO_Level": 0.4}, "prediction": 1, "raw_output": [0.0, 1.0, 0.0]}
+{"timestamp": "2025-11-23T20:38:41.434255", "input": {"HeartRate": 90.0, "Temp": 39.9, "PM25": 50.0, "NO2": 20.0, "CO_Level": 6.0}, "prediction": 1, "raw_output": [0.0, 1.0, 0.0]}
+{"timestamp": "2025-11-23T20:38:58.351776", "input": {"HeartRate": 50.0, "Temp": 35.0, "PM25": 0.0, "NO2": 6.0, "CO_Level": 0.0}, "prediction": 1, "raw_output": [0.0, 1.0, 0.0]}
+{"timestamp": "2025-11-23T20:39:38.861425", "input": {"HeartRate": 90.0, "Temp": 36.5, "PM25": 50.0, "NO2": 20.0, "CO_Level": 0.4}, "prediction": 1, "raw_output": [0.0, 1.0, 0.0]}

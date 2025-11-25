@@ -18,5 +18,11 @@ COPY . /app
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
+# RUN pip install streamlit plotly
+RUN pip install --no-cache-dir streamlit plotly geopandas folium
+
+EXPOSE 8000
+EXPOSE 8501
+
 # Default: open bash
 CMD ["bash"]
